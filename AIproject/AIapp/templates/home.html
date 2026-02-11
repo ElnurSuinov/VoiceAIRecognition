@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI Banking Assistant</title>
+    <link rel="stylesheet" href="{% static 'AIapp/css/base.css' %}">
+    <link rel="stylesheet" href="{% static 'AIapp/css/banking.css' %}">
+    <link rel="stylesheet" href="{% static 'AIapp/css/buttons.css' %}">
+</head>
+
+<body>
+<header class="bank-header">
+    <h1>AI Call Centre Assistant</h1>
+    <p>Secure Voice Banking Support</p>
+</header>
+
+<main class="container">
+    <div id="status" class="status">Idle</div>
+    <button id="recordBtn" class="record-btn">
+        Hold to Talk
+        <span id="record-indicator" class="indicator"></span>
+    </button>
+
+    <div id="text" class="response-box"></div>
+</main>
+
+<script src="{% static 'AIapp/js/recorder.js' %}"></script>
+
+</body>
+</html>

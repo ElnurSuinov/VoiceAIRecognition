@@ -1,0 +1,21 @@
+.record-btn {
+    font-size: 18px;
+    padding: 10px 20px;
+    position: relative;
+}
+
+.indicator {
+    display: none;
+    width: 14px;
+    height: 14px;
+    background-color: red;
+    border-radius: 50%;
+    margin-left: 10px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0% { opacity: 1; }
+    50% { opacity: 0.2; }
+    100% { opacity: 1; }
+}
