@@ -1,58 +1,81 @@
 console.log("recorder.js loaded");
-console.log("Sending audio to server");
-
 
 let mediaRecorder = null;
 let audioChunks = [];
 let recordTimeout = null;
+let stream = null;
 
-const MAX_RECORD_TIME = 10000;
+const MAX_RECORD_TIME = 30000;
 
 const button = document.getElementById("recordBtn");
 const status = document.getElementById("status");
 const textOutput = document.getElementById("text");
+const transcriptOutput = document.getElementById("transcript");
 const indicator = document.getElementById("record-indicator");
 
 button.onmousedown = async () => {
     if (mediaRecorder && mediaRecorder.state === "recording") return;
 
-    status.innerText = "Recording...";
-    indicator.style.display = "inline-block";
-    audioChunks = [];
+    try {
+        status.innerText = "Recording...";
+        indicator.style.display = "inline-block";
+        audioChunks = [];
 
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    mediaRecorder = new MediaRecorder(stream);
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        mediaRecorder = new MediaRecorder(stream);
 
-    mediaRecorder.onstop = async () => {
-        indicator.style.display = "none";
-        status.innerText = "Processing...";
+        mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+        };
 
-        const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-        const formData = new FormData();
-        formData.append("audio", audioBlob);
+        mediaRecorder.onstop = async () => {
+            indicator.style.display = "none";
+            status.innerText = "Processing...";
 
-        const response = await fetch("/", {
-            method: "POST",
-            body: formData
-        });
+            try {
+                const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
+                const formData = new FormData();
+                formData.append("audio", audioBlob);
 
-        const data = await response.json();
+                const response = await fetch("/api/voice/", {
+                    method: "POST",
+                    body: formData
+                });
 
-        textOutput.innerText = "AI: " + data.response;
-        speak(data.response);
+                if (!response.ok) {
+                    throw new Error("Server error");
+                }
 
-        status.innerText = "Done.";
-    };
+                const data = await response.json();
 
-    mediaRecorder.ondataavailable = event => {
-        audioChunks.push(event.data);
-    };
+                transcriptOutput.innerText = "You: " + (data.transcript || "");
+                textOutput.innerText = "AI: " + (data.response || "No response");
 
-    mediaRecorder.start();
+                speak(data.response);
 
-    recordTimeout = setTimeout(() => {
-        stopRecording();
-    }, MAX_RECORD_TIME);
+                status.innerText = "Ready";
+            } catch (error) {
+                console.error(error);
+                status.innerText = "Error occurred";
+                textOutput.innerText = "AI: Something went wrong.";
+            }
+
+            // 🔥 ВАЖНО — выключаем микрофон
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        };
+
+        mediaRecorder.start();
+
+        recordTimeout = setTimeout(() => {
+            stopRecording();
+        }, MAX_RECORD_TIME);
+
+    } catch (error) {
+        console.error(error);
+        status.innerText = "Microphone access denied";
+    }
 };
 
 button.onmouseup = () => {
@@ -73,6 +96,8 @@ function stopRecording() {
 }
 
 function speak(text) {
+    if (!text) return;
+
     speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);

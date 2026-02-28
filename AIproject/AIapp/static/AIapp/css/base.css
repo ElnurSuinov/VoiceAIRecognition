@@ -1,12 +1,23 @@
 body {
     margin: 0;
-    font-family: Inter, Arial, sans-serif;
-    background: #f4f6f9;
-    color: #222;
+    font-family: 'Inter', Arial, sans-serif;
+    background: linear-gradient(135deg, #001f3f, #003366, #00509e);
+    background-size: 400% 400%;
+    animation: gradientMove 12s ease infinite;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-.container {
-    max-width: 500px;
-    margin: 40px auto;
-    text-align: center;
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.app-wrapper {
+    width: 100%;
+    max-width: 480px;
+    padding: 20px;
 }

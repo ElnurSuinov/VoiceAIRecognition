@@ -1,10 +1,15 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 
+
 class IntentClassifierML:
     def __init__(self):
-        self.vectorizer = TfidfVectorizer(ngram_range=(1,2), min_df=1)
-        self.model = LogisticRegression(max_iter=1000)
+        self.vectorizer = TfidfVectorizer(
+            ngram_range=(1, 2),
+            stop_words="english",
+            lowercase=True
+        )
+        self.model = LogisticRegression(max_iter=2000)
 
     def train(self, texts, labels):
         x = self.vectorizer.fit_transform(texts)
@@ -17,4 +22,4 @@ class IntentClassifierML:
         max_proba = probs.max()
         predicted_intent = self.model.classes_[probs.argmax()]
 
-        return predicted_intent, max_proba
+        return predicted_intent, float(max_proba)

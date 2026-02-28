@@ -4,26 +4,41 @@
 <head>
     <meta charset="UTF-8">
     <title>AI Banking Assistant</title>
+
     <link rel="stylesheet" href="{% static 'AIapp/css/base.css' %}">
     <link rel="stylesheet" href="{% static 'AIapp/css/banking.css' %}">
     <link rel="stylesheet" href="{% static 'AIapp/css/buttons.css' %}">
 </head>
 
 <body>
-<header class="bank-header">
-    <h1>AI Call Centre Assistant</h1>
-    <p>Secure Voice Banking Support</p>
-</header>
 
-<main class="container">
-    <div id="status" class="status">Idle</div>
-    <button id="recordBtn" class="record-btn">
-        Hold to Talk
-        <span id="record-indicator" class="indicator"></span>
-    </button>
+<div class="app-wrapper">
 
-    <div id="text" class="response-box"></div>
-</main>
+    <div class="card">
+
+        <div class="header">
+            <h1>AI Banking Assistant</h1>
+            <p>Secure Voice Financial Support</p>
+        </div>
+
+        <div class="status" id="status">
+            Ready
+        </div>
+
+        <button id="recordBtn" class="record-btn">
+            <div class="mic-icon">🎤</div>
+            <span>Hold to Talk</span>
+            <div id="record-indicator" class="indicator"></div>
+        </button>
+
+        <div class="conversation">
+            <div class="user-text" id="transcript"></div>
+            <div class="ai-text" id="text"></div>
+        </div>
+
+    </div>
+
+</div>
 
 <script src="{% static 'AIapp/js/recorder.js' %}"></script>
 

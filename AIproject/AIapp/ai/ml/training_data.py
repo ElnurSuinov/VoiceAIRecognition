@@ -1,43 +1,43 @@
 TRAINING_DATA = [
-    # greeting
+
+    # ===== GREETING =====
     ("hello", "greeting"),
     ("hi", "greeting"),
     ("good morning", "greeting"),
+    ("good afternoon", "greeting"),
 
-    # check_balance
+    # ===== CHECK BALANCE =====
     ("what is my balance", "check_balance"),
     ("tell me my balance", "check_balance"),
-    ("how much money do I have", "check_balance"),
-    ("balance", "check_balance"),
-    ("my balance", "check_balance"),
+    ("how much money do i have", "check_balance"),
+    ("show my balance", "check_balance"),
+    ("check balance", "check_balance"),
     ("account balance", "check_balance"),
 
-    # recent_transactions
+    # ===== RECENT TRANSACTIONS =====
     ("show my recent transactions", "recent_transactions"),
     ("last payments", "recent_transactions"),
-    ("what did I spend money on", "recent_transactions"),
+    ("transaction history", "recent_transactions"),
+    ("what did i spend money on", "recent_transactions"),
+    ("recent transfers", "recent_transactions"),
+    ("show transactions", "recent_transactions"),
 
-    # card_block
+    # ===== TRANSFER MONEY =====
+    ("i want to transfer money", "transfer_money"),
+    ("transfer money", "transfer_money"),
+    ("send money", "transfer_money"),
+    ("make a transfer", "transfer_money"),
+    ("i need to send money", "transfer_money"),
+    ("i want transfer", "transfer_money"),
+    ("i want the transfer money", "transfer_money"),
+    ("can i transfer money", "transfer_money"),
+    ("start transfer", "transfer_money"),
+
+    # ===== OTHER =====
     ("block my card", "card_block"),
-    ("my card was stolen", "card_block"),
-
-    # lost_card
     ("i lost my card", "lost_card"),
-    ("card is missing", "lost_card"),
-
-    # pin_reset
     ("reset my pin", "pin_reset"),
-    ("i forgot my pin", "pin_reset"),
-
-    # branch_hours
     ("when does the bank open", "branch_hours"),
-    ("working hours", "branch_hours"),
-
-    # contact_support
-    ("talk to operator", "contact_support"),
     ("customer support", "contact_support"),
-
-    # goodbye
     ("bye", "goodbye"),
-    ("thank you goodbye", "goodbye"),
 ]

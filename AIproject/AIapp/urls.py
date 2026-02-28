@@ -1,6 +1,7 @@
 from django.urls import  path
-from . import views
+from .views import home_page, voice_api
 
 urlpatterns = [
-       path('', views.home_page)
+       path('', home_page, name="home"),
+       path('api/voice/', voice_api, name="voice_api")
 ]

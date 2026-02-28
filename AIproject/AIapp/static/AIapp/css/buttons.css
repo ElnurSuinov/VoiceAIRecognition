@@ -1,21 +1,36 @@
 .record-btn {
-    font-size: 18px;
-    padding: 10px 20px;
-    position: relative;
+    margin-top: 15px;
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    background: linear-gradient(135deg, #00c6ff, #0072ff);
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+
+.record-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 114, 255, 0.4);
 }
 
 .indicator {
-    display: none;
-    width: 14px;
-    height: 14px;
+    width: 10px;
+    height: 10px;
     background-color: red;
     border-radius: 50%;
-    margin-left: 10px;
-    animation: blink 1s infinite;
+    display: none;
+    animation: pulse 1s infinite;
 }
 
-@keyframes blink {
-    0% { opacity: 1; }
-    50% { opacity: 0.2; }
-    100% { opacity: 1; }
+@keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.6); opacity: 0.4; }
+    100% { transform: scale(1); opacity: 1; }
 }

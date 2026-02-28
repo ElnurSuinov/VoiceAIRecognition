@@ -1,16 +1,25 @@
-# Virtual environment
-.venv/
-
-# PyCharm
-.idea/
-
-# Python cache
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+*.sqlite3
+
+# Virtual environment
+.venv/
+venv/
 
 # Django
-AIproject/db.sqlite3
-AIproject/media/
+media/
+staticfiles/
 
-# Whisper cache
-.cache/
+# IDE
+.idea/
+.vscode/
+
+# Environment variables
+.env
+
+# OS
+.DS_Store
+Thumbs.db
