@@ -1,52 +1,57 @@
-from .stt.speech_to_text import SpeechToText
-from .nlp.nlp_processor import NLPProcessor
-from .ml.intent_service import get_intent
-from .dialogue.dialogue_manager import DialogueManager
-
-CONFIDENCE_THRESHOLD = 0.40
-
-
-def rule_based_fallback(text):
-    if "transfer" in text or "send money" in text:
-        return "transfer_money"
-    if "balance" in text:
-        return "check_balance"
-    if "transaction" in text or "payment" in text:
-        return "recent_transactions"
-    return None
+from AIapp.ai.stt.speech_to_text import SpeechToText
+from AIapp.ai.nlp.nlp_processor import NLPProcessor
+from AIapp.ai.ml.intent_service import get_intent
+from AIapp.ai.dialogue.dialogue_manager import DialogueManager
+import re
 
 
-def run(audio_path, request):
+CONFIDENCE_THRESHOLD = 0.6
+
+
+def run(audio, request):
 
     stt = SpeechToText()
     nlp = NLPProcessor()
-    dialogue = DialogueManager()
+    manager = DialogueManager()
 
-    text = stt.transcribe(audio_path)
+    transcript = stt.transcribe(audio)
 
-    if not text or len(text.strip()) < 1:
-        return "", "fallback", "Sorry, I didn't catch that."
+    if not transcript:
+        return "", "unknown", "I didn't catch that."
 
-    clean_text = nlp.clean(text)
+    clean_text = nlp.clean(transcript)
 
-    # Если идёт активный диалог
-    if request.session.get("state"):
-        response = dialogue.reply(None, clean_text, request.session, request)
-        return text, "in_progress", response
+    # OTP detection
+    if re.fullmatch(r"\d{6}", clean_text):
 
-    # ML предсказание
+        intent = "confirm_otp"
+
+        response = manager.handle(
+            intent,
+            clean_text,
+            request
+        )
+
+        return transcript, intent, response
+
     intent, confidence = get_intent(clean_text)
 
-    print(f"[ML DEBUG] text='{clean_text}' | intent={intent} | confidence={confidence:.2f}")
-
-    # Если уверенность низкая — применяем rule fallback
     if confidence < CONFIDENCE_THRESHOLD:
-        rule_intent = rule_based_fallback(clean_text)
-        if rule_intent:
-            intent = rule_intent
-        else:
-            return text, intent, "Could you please rephrase your request?"
 
-    response = dialogue.reply(intent, clean_text, request.session, request)
+        intent = "unknown"
 
-    return text, intent, response
+        response = manager.handle(
+            intent,
+            clean_text,
+            request
+        )
+
+        return transcript, intent, response
+
+    response = manager.handle(
+        intent,
+        clean_text,
+        request
+    )
+
+    return transcript, intent, response

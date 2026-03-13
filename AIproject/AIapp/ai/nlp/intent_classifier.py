@@ -1,11 +1,8 @@
-class IntentClassifier:
-    def get_intent(self, text):
-        if "hello" in text:
-            return "greeting"
-        elif "balance" in text:
-            return "balance"
-        elif "bill" in text:
-            return  "billing"
-        elif "bye" in text:
-            return "goodbye"
-        return "unknown"
+from AIapp.ai.ml.intent_service import get_intent
+
+
+def classify(text):
+
+    intent, confidence = get_intent(text)
+
+    return intent

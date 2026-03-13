@@ -1,131 +1,195 @@
-from decimal import Decimal
-from AIapp.models import BankAccount, Transaction
+from AIapp.application.transfer_service import TransferService
+from AIapp.application.balance_service import BalanceService
+from AIapp.application.transaction_service import TransactionService
+from AIapp.ai.recommendation.recommendation_engine import RecommendationEngine
+from AIapp.ai.utils.entity_extractor import extract_amount
+from AIapp.ai.llm.llm_service import LLMService
 
 
 class DialogueManager:
 
-    def reply(self, intent, text, session, request):
+    def __init__(self):
 
-        if request.user.is_authenticated:
-            try:
-                account = BankAccount.objects.get(user=request.user)
-            except BankAccount.DoesNotExist:
-                return "No bank account found for your user."
-        else:
-            return "User not authenticated."
+        self.transfer_service = TransferService()
+        self.balance_service = BalanceService()
+        self.transaction_service = TransactionService()
+        self.recommendation_engine = RecommendationEngine()
+        self.llm = LLMService()
 
-        if session.get("state") == "transfer_money":
+    def handle(self, intent, text, request):
 
-            step = session.get("step")
+        user = request.user
 
-            if step == "ask_amount":
-
-                if not text.isdigit():
-                    return "Please tell me the amount in numbers."
-
-                amount = Decimal(text)
-                current_balance = account.balance
-
-                if amount > current_balance:
-                    return f"You do not have sufficient funds. Your current balance is {current_balance} pounds."
-
-                session["amount"] = str(amount)
-                session["step"] = "ask_account"
-
-                return "To which account would you like to transfer the money? Savings or current?"
-
-            if step == "ask_account":
-
-                if text not in ["savings", "current"]:
-                    return "Please specify savings or current account."
-
-                session["account"] = text
-                session["step"] = "confirm"
-
-                amount = session.get("amount")
-
-                return (
-                    f"You are about to transfer {amount} pounds to {text} account. "
-                    f"Do you confirm?"
-                )
-
-            if step == "confirm":
-
-                if text in ["yes", "confirm", "sure"]:
-
-                    amount = Decimal(session.get("amount"))
-                    account_name = session.get("account")
-
-                    account.balance -= amount
-                    account.save()
-
-                    Transaction.objects.create(
-                        account=account,
-                        amount=amount,
-                        target_account=account_name
-                    )
-
-                    new_balance = account.balance
-
-                    session["state"] = None
-                    session["step"] = None
-                    session["amount"] = None
-                    session["account"] = None
-
-                    return (
-                        f"Transfer of {amount} pounds to {account_name} account completed successfully. "
-                        f"Your new balance is {new_balance} pounds."
-                    )
-
-                if text in ["no", "cancel"]:
-                    session.clear()
-                    return "Transfer cancelled."
-
-                return "Please say yes to confirm or no to cancel."
-
-        if intent == "transfer_money":
-            session["state"] = "transfer_money"
-            session["step"] = "ask_amount"
-            return "How much would you like to transfer?"
+        # -------------------------------
+        # GREETING
+        # -------------------------------
 
         if intent == "greeting":
-            return "Hello! How can I assist you today?"
+
+            return (
+                "Hello! I am your AI banking assistant. "
+                "I can help you with balances, transfers, loans, "
+                "deposits, cards and financial advice."
+            )
+
+        # -------------------------------
+        # CHECK BALANCE
+        # -------------------------------
 
         if intent == "check_balance":
-            return f"Your current balance is {account.balance} pounds."
+
+            balance = self.balance_service.get_balance(user)
+
+            return f"Your current balance is {balance} pounds."
+
+        # -------------------------------
+        # MONEY TRANSFER
+        # -------------------------------
+
+        if intent == "transfer_money":
+
+            amount = extract_amount(text)
+
+            if not amount:
+
+                return "Please specify the transfer amount."
+
+            result = self.transfer_service.execute(
+                user,
+                amount,
+                "default"
+            )
+
+            if isinstance(result, dict):
+
+                request.session["pending_transaction"] = result.get(
+                    "transaction_id"
+                )
+
+                return result["message"]
+
+            return result
+
+        # -------------------------------
+        # CONFIRM OTP
+        # -------------------------------
+
+        if intent == "confirm_otp":
+
+            transaction_id = request.session.get("pending_transaction")
+
+            if not transaction_id:
+
+                return "There is no pending transaction to confirm."
+
+            result = self.transfer_service.confirm_2fa(
+                transaction_id,
+                text
+            )
+
+            request.session["pending_transaction"] = None
+
+            return result
+
+        # -------------------------------
+        # TRANSACTION HISTORY
+        # -------------------------------
 
         if intent == "recent_transactions":
 
-            transactions = Transaction.objects.filter(
-                account=account
-            ).order_by("-created_at")[:3]
+            transactions = self.transaction_service.get_recent_transactions(user)
 
             if not transactions:
+
                 return "You have no recent transactions."
 
-            response_parts = [
-                f"{t.amount} pounds to {t.target_account}"
-                for t in transactions
-            ]
+            result = []
 
-            return "Your last transactions were: " + ", ".join(response_parts)
+            for t in transactions:
 
-        if intent == "card_block":
-            return "Your card has been blocked for security reasons."
+                result.append(f"{t.amount} pounds")
 
-        if intent == "lost_card":
-            return "I have blocked your card. A new one will be issued."
+            return "Your recent transactions: " + ", ".join(result)
 
-        if intent == "pin_reset":
-            return "A PIN reset request has been submitted."
+        # -------------------------------
+        # LOANS
+        # -------------------------------
 
-        if intent == "branch_hours":
-            return "Our branches are open from 9 AM to 5 PM."
+        if intent == "loan_info":
 
-        if intent == "contact_support":
-            return "I am transferring you to a customer support agent."
+            return (
+                "We offer several loan options including "
+                "personal loans, auto loans and mortgages."
+            )
 
-        if intent == "goodbye":
-            return "Thank you for calling. Have a nice day."
+        # -------------------------------
+        # DEPOSITS
+        # -------------------------------
 
-        return "I’m sorry, I could not clearly understand your request. Please repeat it."
+        if intent == "deposit_info":
+
+            return (
+                "We offer fixed-term deposits and flexible "
+                "savings accounts with competitive interest rates."
+            )
+
+        # -------------------------------
+        # CARDS
+        # -------------------------------
+
+        if intent == "card_info":
+
+            return (
+                "Our bank offers debit and credit cards "
+                "with cashback, travel rewards and mobile payments."
+            )
+
+        # -------------------------------
+        # INSURANCE
+        # -------------------------------
+
+        if intent == "insurance_info":
+
+            return (
+                "We provide insurance products including "
+                "life insurance, health insurance and property insurance."
+            )
+
+        # -------------------------------
+        # INVESTMENTS
+        # -------------------------------
+
+        if intent == "investment_info":
+
+            return (
+                "You can invest through our bank using mutual funds, "
+                "government bonds or managed portfolios."
+            )
+
+        # -------------------------------
+        # INTERNET BANKING
+        # -------------------------------
+
+        if intent == "internet_banking":
+
+            return (
+                "You can access internet banking through "
+                "our website or mobile banking application."
+            )
+
+        # -------------------------------
+        # LOAN RECOMMENDATION
+        # -------------------------------
+
+        if intent == "advisory_loan":
+
+            return self.recommendation_engine.recommend(intent)
+
+        # -------------------------------
+        # LLM FALLBACK
+        # -------------------------------
+
+        if intent is None or intent == "unknown":
+            return self.llm.generate(text)
+
+        return self.llm.generate(text)

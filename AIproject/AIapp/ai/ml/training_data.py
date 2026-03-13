@@ -1,43 +1,55 @@
 TRAINING_DATA = [
 
-    # ===== GREETING =====
-    ("hello", "greeting"),
-    ("hi", "greeting"),
-    ("good morning", "greeting"),
-    ("good afternoon", "greeting"),
+# GREETING
+("hello", "greeting"),
+("hi", "greeting"),
+("good morning", "greeting"),
+("good evening", "greeting"),
 
-    # ===== CHECK BALANCE =====
-    ("what is my balance", "check_balance"),
-    ("tell me my balance", "check_balance"),
-    ("how much money do i have", "check_balance"),
-    ("show my balance", "check_balance"),
-    ("check balance", "check_balance"),
-    ("account balance", "check_balance"),
+# BALANCE
+("what is my balance", "check_balance"),
+("show my balance", "check_balance"),
+("how much money do i have", "check_balance"),
 
-    # ===== RECENT TRANSACTIONS =====
-    ("show my recent transactions", "recent_transactions"),
-    ("last payments", "recent_transactions"),
-    ("transaction history", "recent_transactions"),
-    ("what did i spend money on", "recent_transactions"),
-    ("recent transfers", "recent_transactions"),
-    ("show transactions", "recent_transactions"),
+# TRANSFER
+("transfer money", "transfer_money"),
+("send money", "transfer_money"),
+("send 200 pounds", "transfer_money"),
+("transfer 500", "transfer_money"),
 
-    # ===== TRANSFER MONEY =====
-    ("i want to transfer money", "transfer_money"),
-    ("transfer money", "transfer_money"),
-    ("send money", "transfer_money"),
-    ("make a transfer", "transfer_money"),
-    ("i need to send money", "transfer_money"),
-    ("i want transfer", "transfer_money"),
-    ("i want the transfer money", "transfer_money"),
-    ("can i transfer money", "transfer_money"),
-    ("start transfer", "transfer_money"),
+# TRANSACTIONS
+("show recent transactions", "recent_transactions"),
+("transaction history", "recent_transactions"),
 
-    # ===== OTHER =====
-    ("block my card", "card_block"),
-    ("i lost my card", "lost_card"),
-    ("reset my pin", "pin_reset"),
-    ("when does the bank open", "branch_hours"),
-    ("customer support", "contact_support"),
-    ("bye", "goodbye"),
+# LOANS
+("i want a loan", "loan_info"),
+("tell me about loans", "loan_info"),
+("what loan options do you offer", "loan_info"),
+("how can i get a mortgage", "loan_info"),
+
+# DEPOSITS
+("what deposits do you offer", "deposit_info"),
+("tell me about deposits", "deposit_info"),
+("deposit interest rate", "deposit_info"),
+
+# CARDS
+("what cards do you offer", "card_info"),
+("how to order a credit card", "card_info"),
+("tell me about bank cards", "card_info"),
+
+# INSURANCE
+("do you offer insurance", "insurance_info"),
+("life insurance options", "insurance_info"),
+
+# INVESTMENTS
+("how to start investing", "investment_info"),
+("investment products", "investment_info"),
+
+# INTERNET BANKING
+("how to use mobile banking", "internet_banking"),
+("how to register in internet banking", "internet_banking"),
+
+# OTP
+("123456", "confirm_otp"),
+("my code is 123456", "confirm_otp"),
 ]

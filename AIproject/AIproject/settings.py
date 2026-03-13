@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-uu#qhm@$zb6&0_3xd&i&@l)x*0*tjn58*ckjv#k2)@kj)19b$1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -75,8 +75,12 @@ WSGI_APPLICATION = 'AIproject.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'ai_banking',
+        'USER': 'postgres',
+        'PASSWORD': 'postgres',
+        'HOST': 'postgres',
+        'PORT': '5432'
     }
 }
 
@@ -122,3 +126,13 @@ MEDIA_ROOT = BASE_DIR / 'media'
 LOGIN_URL = "/login/"
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/login/"
+
+REDIS_HOST = "redis"
+REDIS_PORT = 6379
+REDIS_DB = 0
+
+CELERY_BROKER_URL = "redis://redis:6379/0"
+CELERY_RESULT_BACKEND = "redis://redis:6379/0"
+
+CELERY_ACCEPT_CONTENT = ["json"]
+CELERY_TASK_SERIALIZER = "json"
