@@ -3,6 +3,10 @@ import requests
 
 class LLMService:
 
+    OLLAMA_URL = "http://host.docker.internal:11434/api/generate"
+    MODEL = "phi3"
+    TIMEOUT = 30
+
     def generate(self, text):
 
         prompt = f"""
@@ -23,6 +27,12 @@ User question:
 
 Answer:
 """
+        return self._call(prompt)
+
+    def generate_with_prompt(self, prompt):
+        return self._call(prompt)
+
+    def _call(self, prompt):
 
         try:
 

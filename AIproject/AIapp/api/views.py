@@ -1,11 +1,9 @@
 import json
 from django.shortcuts import render
-
-from django.http import JsonResponse, HttpResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
-
 from AIapp.ai.pipeline import run
 from AIapp.application.transfer_service import TransferService
 from AIapp.application.exceptions import BankingException
@@ -22,28 +20,21 @@ def home_page(request):
 @require_POST
 @login_required
 def voice_api(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
 
     audio = request.FILES.get("audio")
     if not audio:
         return JsonResponse({"error": "No audio file provided"}, status=400)
 
-    # 🔹 Используем request:
-    user = request.user
-    idempotency_key = request.headers.get("Idempotency-Key")
-    client_ip = request.META.get("REMOTE_ADDR")
-
     try:
         transcript, intent, response = run(audio, request)
-
         return JsonResponse({
             "transcript": transcript,
             "intent": intent,
             "response": response,
-            "user": user.username,
-            "client_ip": client_ip,
-            "idempotency_key": idempotency_key
+            "user": request.user.username,
         })
-
     except BankingException as e:
         return JsonResponse({"error": str(e)}, status=400)
 
@@ -52,6 +43,8 @@ def voice_api(request):
 @require_POST
 @login_required
 def confirm_2fa_api(request):
+    if not request.user.is_authenticated:
+        return JsonResponse({"error": "Unauthorized"}, status=401)
 
     try:
         data = json.loads(request.body)
@@ -64,20 +57,9 @@ def confirm_2fa_api(request):
     if not transaction_id or not code:
         return JsonResponse({"error": "Missing fields"}, status=400)
 
-    # 🔹 Используем request
-    user = request.user
-    client_ip = request.META.get("REMOTE_ADDR")
-
     service = TransferService()
-
     try:
         message = service.confirm_2fa(transaction_id, code)
-
-        return JsonResponse({
-            "message": message,
-            "user": user.username,
-            "client_ip": client_ip
-        })
-
+        return JsonResponse({"message": message})
     except BankingException as e:
         return JsonResponse({"error": str(e)}, status=400)

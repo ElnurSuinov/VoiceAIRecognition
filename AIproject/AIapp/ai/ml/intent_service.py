@@ -5,8 +5,9 @@ from AIapp.ai.ml.intent_model import IntentModel
 from AIapp.ai.ml.training_data import TRAINING_DATA
 
 
-MODEL_PATH = "intent_model.pkl"
-VECTORIZER_PATH = "intent_vectorizer.pkl"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+MODEL_PATH = os.path.join(BASE_DIR, "intent_model.pkl")
+VECTORIZER_PATH = os.path.join(BASE_DIR, "vectorizer.pkl")
 
 
 def _create_and_train_model():

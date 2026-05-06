@@ -13,6 +13,18 @@ const textOutput = document.getElementById("text");
 const transcriptOutput = document.getElementById("transcript");
 const indicator = document.getElementById("record-indicator");
 
+function getCsrfToken() {
+    const name = "csrftoken";
+    const cookies = document.cookie.split(";");
+    for (let cookie of cookies) {
+        cookie = cookie.trim();
+        if (cookie.startsWith(name + "=")) {
+            return decodeURIComponent(cookie.substring(name.length + 1));
+        }
+    }
+    return "";
+}
+
 button.onmousedown = async () => {
     if (mediaRecorder && mediaRecorder.state === "recording") return;
 
@@ -60,7 +72,6 @@ button.onmousedown = async () => {
                 textOutput.innerText = "AI: Something went wrong.";
             }
 
-            // 🔥 ВАЖНО — выключаем микрофон
             if (stream) {
                 stream.getTracks().forEach(track => track.stop());
             }

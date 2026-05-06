@@ -136,3 +136,27 @@ CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
+
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
+        "LOCATION": "redis://redis:6379/1",
+    }
+}
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+CSRF_COOKIE_HTTPONLY = False
+CSRF_COOKIE_SAMESITE = "Lax"
+CSRF_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = [
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+STATICFILES_DIRS = [BASE_DIR / "AIapp" / "static"]

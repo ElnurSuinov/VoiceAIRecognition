@@ -5,7 +5,7 @@ from AIapp.ai.dialogue.dialogue_manager import DialogueManager
 import re
 
 
-CONFIDENCE_THRESHOLD = 0.6
+CONFIDENCE_THRESHOLD = 0.20
 
 
 def run(audio, request):
@@ -22,31 +22,19 @@ def run(audio, request):
     clean_text = nlp.clean(transcript)
 
     # OTP detection
-    if re.fullmatch(r"\d{6}", clean_text):
-
+    otp_match = re.search(r"\b\d{6}\b", clean_text)
+    if otp_match:
         intent = "confirm_otp"
-
-        response = manager.handle(
-            intent,
-            clean_text,
-            request
-        )
-
+        otp_code = otp_match.group()
+        response = manager.handle(intent, otp_code, request)
         return transcript, intent, response
 
-    intent, confidence = get_intent(clean_text)
+    lemmatized = nlp.lemmatize(clean_text)
+
+    intent, confidence = get_intent(lemmatized)
 
     if confidence < CONFIDENCE_THRESHOLD:
-
-        intent = "unknown"
-
-        response = manager.handle(
-            intent,
-            clean_text,
-            request
-        )
-
-        return transcript, intent, response
+        return transcript, intent, manager.handle(None, clean_text, request)
 
     response = manager.handle(
         intent,

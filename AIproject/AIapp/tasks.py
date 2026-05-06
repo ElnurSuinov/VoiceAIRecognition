@@ -1,14 +1,24 @@
 from celery import shared_task
-
+from django.core.mail import send_mail
+from django.contrib.auth.models import User
 from AIapp.models import Transaction
 from AIapp.risk.risk_engine import RiskEngine
 
 
 @shared_task
 def send_otp_task(user_id, code):
-
-    print(f"Sending OTP {code} to user {user_id}")
-
+    try:
+        user = User.objects.get(id=user_id)
+        send_mail(
+            subject="Your verification code",
+            message=f"Your OTP code is: {code}\n\nValid for 5 minutes.",
+            from_email="noreply@aibanking.com",
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+        print(f"OTP sent to {user.email}")
+    except Exception as e:
+        print(f"OTP send error: {e}")
     return True
 
 

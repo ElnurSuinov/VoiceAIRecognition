@@ -1,6 +1,6 @@
-import random
 from datetime import timedelta
 from django.utils import timezone
+import secrets
 
 from AIapp.models import TwoFactorCode
 from AIapp.application.exceptions import TwoFactorFailedException
@@ -14,7 +14,7 @@ class TwoFactorService:
 
     def generate(self, transaction):
 
-        code = str(random.randint(100000, 999999))
+        code = str(secrets.randbelow(900000) + 100000)
 
         expires = timezone.now() + timedelta(minutes=self.EXPIRATION_MINUTES)
 

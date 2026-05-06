@@ -168,7 +168,6 @@ class TransferService:
                 metadata={"transaction_id": transaction_obj.pk}
             )
 
-            print(f"DEBUG OTP: {code}")
 
             return {
                 "message": "2FA verification required.",

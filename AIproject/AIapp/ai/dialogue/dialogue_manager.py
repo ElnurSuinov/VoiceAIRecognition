@@ -4,6 +4,8 @@ from AIapp.application.transaction_service import TransactionService
 from AIapp.ai.recommendation.recommendation_engine import RecommendationEngine
 from AIapp.ai.utils.entity_extractor import extract_amount
 from AIapp.ai.llm.llm_service import LLMService
+from AIapp.ai.dialogue.advisory.deposit_handler import handle_deposit
+from AIapp.ai.dialogue.advisory.loan_handler import handle_loan
 
 
 class DialogueManager:
@@ -27,7 +29,7 @@ class DialogueManager:
         if intent == "greeting":
 
             return (
-                "Hello! I am your AI banking assistant. "
+                f"Hello {user.first_name or user.username}! I am your AI banking assistant. "
                 "I can help you with balances, transfers, loans, "
                 "deposits, cards and financial advice."
             )
